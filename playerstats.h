@@ -7,7 +7,7 @@ class playerStats
 {
 public:
     playerStats();
-private:
+
     QMap<int, QString> name;
     QMap<int, int> games;
     QMap<int, double> rebounds;

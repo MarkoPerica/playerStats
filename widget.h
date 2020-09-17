@@ -10,6 +10,7 @@
 #include <QDir>
 #include <QTextStream>
 #include <QtDebug>
+#include "playerstats.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Widget; }
@@ -22,6 +23,7 @@ class Widget : public QWidget
 public:
     Widget(QWidget *parent = nullptr);
     ~Widget();
+
 
 private slots:
     void on_buttonDownload_clicked();
