@@ -11,11 +11,27 @@ Widget::Widget(QWidget *parent)
     setWindowTitle("Player Stats");
     ui->playerTable->setColumnCount(8);
     ui->playerTable->setHorizontalHeaderLabels(header);
+    ui->playerTable->setRowCount(550);
 }
 
 Widget::~Widget()
 {
     delete ui;
+}
+
+void Widget::populateTable()
+{
+    int j;
+    QMap<int, QString>::iterator i;
+    for(i = pS->_name.begin(), j = 0; i != pS->_name.end(); i++, j++) {
+        ui->playerTable->setRowCount(j+1);
+        QTableWidgetItem *pCell = ui->playerTable->item(j, 0);
+        pCell->setText(i.value());
+        if(!pCell) {
+            pCell = new QTableWidgetItem;
+            ui->playerTable->setItem(j, 0, pCell);
+        }
+    }
 }
 
 

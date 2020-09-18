@@ -25,9 +25,8 @@ public:
     void blocksPerGame();
     void pointsPerGame();
 
+    friend class widget;
 
-
-private:
     QMap<int, QString> _name;
     QMap<int, double> _games;
     QMap<int, double> _rebounds;

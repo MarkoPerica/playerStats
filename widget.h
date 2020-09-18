@@ -25,6 +25,10 @@ public:
     Widget(QWidget *parent = nullptr);
     ~Widget();
 
+    void populateTable();
+
+    friend class playerStats;
+
 private slots:
     void on_buttonDownload_clicked();
 
