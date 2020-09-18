@@ -8,15 +8,27 @@ class playerStats
 public:
     playerStats();
 
-    QMap<int, QString> name;
-    QMap<int, int> games;
-    QMap<int, double> rebounds;
-    QMap<int, double> assists;
-    QMap<int, double> steals;
-    QMap<int, double> blocks;
-    QMap<int, double> points;
-    QMap<int, double> fantasyPoints;
+    ~playerStats();
 
+    void insertName(int key, QString value);
+    void insertGames(int key, int value);
+    void insertRebounds(int key, double value);
+    void insertAssists(int key, double value);
+    void insertSteals(int key, double value);
+    void insertBlocks(int key, double value);
+    void insertPoints(int key, double value);
+    void insertFantasyPoints(int key, double value);
+
+
+private:
+    QMap<int, QString> _name;
+    QMap<int, int> _games;
+    QMap<int, double> _rebounds;
+    QMap<int, double> _assists;
+    QMap<int, double> _steals;
+    QMap<int, double> _blocks;
+    QMap<int, double> _points;
+    QMap<int, double> _fantasyPoints;
 };
 
 #endif // PLAYERSTATS_H

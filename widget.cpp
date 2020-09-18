@@ -16,6 +16,7 @@ Widget::~Widget()
 
 void Widget::on_buttonDownload_clicked()
 {
+
     QFile file;
     QVariantMap map;
     file.setFileName("players.json");
@@ -42,14 +43,13 @@ void Widget::on_buttonDownload_clicked()
     playerStats *pS = new playerStats();
 
     foreach(const QJsonValue & v, array) {
-        pS->name.insert(v.toObject().value("PlayerID").toInt(),v.toObject().value("Name").toString());
-        pS->games.insert(v.toObject().value("PlayerID").toInt(),v.toObject().value("Games").toDouble());
-        pS->rebounds.insert(v.toObject().value("PlayerID").toInt(),v.toObject().value("Rebounds").toDouble());
-        pS->assists.insert(v.toObject().value("PlayerID").toInt(),v.toObject().value("Assists").toDouble());
-        pS->steals.insert(v.toObject().value("PlayerID").toInt(),v.toObject().value("Steals").toDouble());
-        pS->blocks.insert(v.toObject().value("PlayerID").toInt(),v.toObject().value("Blocks").toDouble());
-        pS->points.insert(v.toObject().value("PlayerID").toInt(),v.toObject().value("Points").toDouble());
-        pS->fantasyPoints.insert(v.toObject().value("PlayerID").toInt(),v.toObject().value("FantasyPoints").toDouble());
+        pS->insertName(v.toObject().value("PlayerID").toInt(),v.toObject().value("Name").toString());
+        pS->insertGames(v.toObject().value("PlayerID").toInt(),v.toObject().value("Games").toInt());
+        pS->insertRebounds(v.toObject().value("PlayerID").toInt(),v.toObject().value("Rebounds").toDouble());
+        pS->insertAssists(v.toObject().value("PlayerID").toInt(),v.toObject().value("Assists").toDouble());
+        pS->insertSteals(v.toObject().value("PlayerID").toInt(),v.toObject().value("Steals").toDouble());
+        pS->insertBlocks(v.toObject().value("PlayerID").toInt(),v.toObject().value("Blocks").toDouble());
+        pS->insertPoints(v.toObject().value("PlayerID").toInt(),v.toObject().value("Points").toDouble());
+        pS->insertFantasyPoints(v.toObject().value("PlayerID").toInt(),v.toObject().value("FantasyPoints").toDouble());
     }
-
 }
