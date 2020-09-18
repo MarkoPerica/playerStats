@@ -40,8 +40,6 @@ void Widget::on_buttonDownload_clicked()
     QJsonValue value = object.value("playersArray");
     QJsonArray array = value.toArray();
 
-    playerStats *pS = new playerStats();
-
     foreach(const QJsonValue & v, array) {
         pS->insertName(v.toObject().value("PlayerID").toInt(),v.toObject().value("Name").toString());
         pS->insertGames(v.toObject().value("PlayerID").toInt(),v.toObject().value("Games").toInt());

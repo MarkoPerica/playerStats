@@ -2,6 +2,7 @@
 #define WIDGET_H
 
 #include <QWidget>
+#include <QWidget>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -24,11 +25,11 @@ public:
     Widget(QWidget *parent = nullptr);
     ~Widget();
 
-
 private slots:
     void on_buttonDownload_clicked();
 
 private:
     Ui::Widget *ui;
+    playerStats *pS;
 };
 #endif // WIDGET_H
