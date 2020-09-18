@@ -19,10 +19,17 @@ public:
     void insertPoints(int key, double value);
     void insertFantasyPoints(int key, double value);
 
+    void reboundsPerGame();
+    void assistsPerGame();
+    void stealsPerGame();
+    void blocksPerGame();
+    void pointsPerGame();
+
+
 
 private:
     QMap<int, QString> _name;
-    QMap<int, int> _games;
+    QMap<int, double> _games;
     QMap<int, double> _rebounds;
     QMap<int, double> _assists;
     QMap<int, double> _steals;

@@ -6,6 +6,11 @@ Widget::Widget(QWidget *parent)
     , ui(new Ui::Widget)
 {
     ui->setupUi(this);
+    QStringList header;
+    header << "Name" << "Games" << "Rebounds" << "Assits" << "Steals" << "Blocks" << "Points" << "Fantasy Points";
+    setWindowTitle("Player Stats");
+    ui->playerTable->setColumnCount(8);
+    ui->playerTable->setHorizontalHeaderLabels(header);
 }
 
 Widget::~Widget()
@@ -42,7 +47,7 @@ void Widget::on_buttonDownload_clicked()
 
     foreach(const QJsonValue & v, array) {
         pS->insertName(v.toObject().value("PlayerID").toInt(),v.toObject().value("Name").toString());
-        pS->insertGames(v.toObject().value("PlayerID").toInt(),v.toObject().value("Games").toInt());
+        pS->insertGames(v.toObject().value("PlayerID").toInt(),v.toObject().value("Games").toDouble());
         pS->insertRebounds(v.toObject().value("PlayerID").toInt(),v.toObject().value("Rebounds").toDouble());
         pS->insertAssists(v.toObject().value("PlayerID").toInt(),v.toObject().value("Assists").toDouble());
         pS->insertSteals(v.toObject().value("PlayerID").toInt(),v.toObject().value("Steals").toDouble());
