@@ -11,7 +11,7 @@ Widget::Widget(QWidget *parent)
     setWindowTitle("Player Stats");
     ui->playerTable->setColumnCount(8);
     ui->playerTable->setHorizontalHeaderLabels(header);
-    ui->playerTable->setRowCount(550);
+    ui->playerTable->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 }
 
 Widget::~Widget()
@@ -24,6 +24,7 @@ void Widget::populateFirstColumn()
     int j;
     QMap<int, QString>::iterator i;
     for(i = pS._name.begin(), j = 0; i != pS._name.end(); i++, j++) {
+        ui->playerTable->setRowCount(j+1);
         auto *pCell = new QTableWidgetItem(i.value());
         ui->playerTable->setItem(j, 0, pCell);
     }
@@ -40,7 +41,6 @@ void Widget::populateRest() {
                 j++;
             }
         }
-
 }
 
 void Widget::jsonReader() {
