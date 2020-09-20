@@ -10,7 +10,8 @@
 #include <QDir>
 #include <QTextStream>
 #include <QtDebug>
-#include "playerstats.h"
+#include <playerstats.h>
+#include <downloader.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Widget; }
@@ -31,9 +32,12 @@ public:
 
 private slots:
     void on_buttonDownload_clicked();
+    void readFile();
 
 private:
     Ui::Widget *ui;
     playerStats pS;
+    downloader *downloader;
+
 };
 #endif // WIDGET_H

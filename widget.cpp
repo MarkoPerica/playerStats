@@ -13,11 +13,20 @@ Widget::Widget(QWidget *parent)
     ui->playerTable->setHorizontalHeaderLabels(header);
     ui->playerTable->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     ui->playerTable->resizeRowsToContents();
+
+    downloader = new class downloader();
+
+    connect(ui->buttonDownload, &QPushButton::clicked, downloader, &downloader::getData);
+    connect(downloader, &downloader::onReady, this, &Widget::readFile);
+
 }
 
 Widget::~Widget()
 {
     delete ui;
+}
+
+void Widget::readFile() {
 }
 
 void Widget::populateFirstColumn()
