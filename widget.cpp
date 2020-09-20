@@ -12,6 +12,7 @@ Widget::Widget(QWidget *parent)
     ui->playerTable->setColumnCount(8);
     ui->playerTable->setHorizontalHeaderLabels(header);
     ui->playerTable->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    ui->playerTable->resizeRowsToContents();
 }
 
 Widget::~Widget()
