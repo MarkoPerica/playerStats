@@ -7,7 +7,7 @@ Widget::Widget(QWidget *parent)
 {
     ui->setupUi(this);
     QStringList header;
-    header << "Name" << "Games" << "Rebounds" << "Assits" << "Steals" << "Blocks" << "Points" << "Fantasy Points";
+    header << "Name" << "Games" << "Rebounds" << "Assists" << "Steals" << "Blocks" << "Points" << "Fantasy Points";
     setWindowTitle("Player Stats");
     ui->playerTable->setColumnCount(8);
     ui->playerTable->setHorizontalHeaderLabels(header);
@@ -19,25 +19,31 @@ Widget::~Widget()
     delete ui;
 }
 
-void Widget::populateTable()
+void Widget::populateFirstColumn()
 {
     int j;
     QMap<int, QString>::iterator i;
-    for(i = pS->_name.begin(), j = 0; i != pS->_name.end(); i++, j++) {
-        ui->playerTable->setRowCount(j+1);
-        QTableWidgetItem *pCell = ui->playerTable->item(j, 0);
-        pCell->setText(i.value());
-        if(!pCell) {
-            pCell = new QTableWidgetItem;
-            ui->playerTable->setItem(j, 0, pCell);
-        }
+    for(i = pS._name.begin(), j = 0; i != pS._name.end(); i++, j++) {
+        auto *pCell = new QTableWidgetItem(i.value());
+        ui->playerTable->setItem(j, 0, pCell);
     }
 }
 
+void Widget::populateRest() {
+    int j = 0, k;
+    QMap<int, double>::iterator i;
+        for (i = pS._stats.begin(), k = 1; i != pS._stats.end(); i++, k++) {
+            QString q = QString::number(i.value());
+            ui->playerTable->setItem(j, k, new QTableWidgetItem(q));
+            if (k == ui->playerTable->columnCount()-1) {
+                k = 0;
+                j++;
+            }
+        }
 
-void Widget::on_buttonDownload_clicked()
-{
+}
 
+void Widget::jsonReader() {
     QFile file;
     QVariantMap map;
     file.setFileName("players.json");
@@ -62,13 +68,27 @@ void Widget::on_buttonDownload_clicked()
     QJsonArray array = value.toArray();
 
     foreach(const QJsonValue & v, array) {
-        pS->insertName(v.toObject().value("PlayerID").toInt(),v.toObject().value("Name").toString());
-        pS->insertGames(v.toObject().value("PlayerID").toInt(),v.toObject().value("Games").toDouble());
-        pS->insertRebounds(v.toObject().value("PlayerID").toInt(),v.toObject().value("Rebounds").toDouble());
-        pS->insertAssists(v.toObject().value("PlayerID").toInt(),v.toObject().value("Assists").toDouble());
-        pS->insertSteals(v.toObject().value("PlayerID").toInt(),v.toObject().value("Steals").toDouble());
-        pS->insertBlocks(v.toObject().value("PlayerID").toInt(),v.toObject().value("Blocks").toDouble());
-        pS->insertPoints(v.toObject().value("PlayerID").toInt(),v.toObject().value("Points").toDouble());
-        pS->insertFantasyPoints(v.toObject().value("PlayerID").toInt(),v.toObject().value("FantasyPoints").toDouble());
+
+        if (v.toObject().value("Games").toDouble() == 0)
+            continue;
+
+        pS._name.insert(v.toObject().value("PlayerID").toInt(), v.toObject().value("Name").toString());
+        pS._stats.insert(v.toObject().value("PlayerID").toInt(), v.toObject().value("FantasyPoints").toDouble());
+        pS._stats.insert(v.toObject().value("PlayerID").toInt(), v.toObject().value("Points").toDouble() / v.toObject().value("Games").toDouble());
+        pS._stats.insert(v.toObject().value("PlayerID").toInt(), v.toObject().value("BlockedShots").toDouble() / v.toObject().value("Games").toDouble());
+        pS._stats.insert(v.toObject().value("PlayerID").toInt(), v.toObject().value("Steals").toDouble() / v.toObject().value("Games").toDouble());
+        pS._stats.insert(v.toObject().value("PlayerID").toInt(), v.toObject().value("Assists").toDouble() / v.toObject().value("Games").toDouble());
+        pS._stats.insert(v.toObject().value("PlayerID").toInt(), v.toObject().value("Rebounds").toDouble() / v.toObject().value("Games").toDouble());
+        pS._stats.insert(v.toObject().value("PlayerID").toInt(), v.toObject().value("Games").toDouble());
     }
+}
+
+
+
+
+void Widget::on_buttonDownload_clicked()
+{
+    jsonReader();
+    populateFirstColumn();
+    populateRest();
 }
