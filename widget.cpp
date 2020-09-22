@@ -13,11 +13,12 @@ Widget::Widget(QWidget *parent)
     ui->playerTable->setHorizontalHeaderLabels(header);
     ui->playerTable->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     ui->playerTable->resizeRowsToContents();
+    ui->playerTable->setMinimumHeight(500);
 
     downloader = new class downloader();
 
     connect(ui->buttonDownload, &QPushButton::clicked, downloader, &downloader::getData);
-    connect(downloader, &downloader::onReady, this, &Widget::readFile);
+    connect(downloader, &downloader::onReady, this, &Widget::readFileAndPopulateTable);
 
 }
 
@@ -26,79 +27,63 @@ Widget::~Widget()
     delete ui;
 }
 
-void Widget::readFile() {
-}
-
-void Widget::populateFirstColumn()
-{
-    int j;
-    QMap<int, QString>::iterator i;
-    for(i = pS._name.begin(), j = 0; i != pS._name.end(); i++, j++) {
-        ui->playerTable->setRowCount(j+1);
-        auto *pCell = new QTableWidgetItem(i.value());
-        ui->playerTable->setItem(j, 0, pCell);
-    }
-}
-
-void Widget::populateRest() {
-    int j = 0, k;
-    QMap<int, double>::iterator i;
-        for (i = pS._stats.begin(), k = 1; i != pS._stats.end(); i++, k++) {
-            QString q = QString::number(i.value());
-            ui->playerTable->setItem(j, k, new QTableWidgetItem(q));
-            if (k == ui->playerTable->columnCount()-1) {
-                k = 0;
-                j++;
-            }
-        }
-}
-
-void Widget::jsonReader() {
-    QFile file;
-    QVariantMap map;
-    file.setFileName("players.json");
-    if (!file.open((QIODevice::ReadOnly|QIODevice::Text))) {
-        QMessageBox::critical(0, "Error", "Failed to open\n");
-    }
-    QTextStream file_text(&file);
-    QString json_string;
-    json_string = file_text.readAll();
-    file.close();
-    QByteArray json_bytes = json_string.toLocal8Bit();
-
-    auto json_doc = QJsonDocument::fromJson(json_bytes);
-
-    if (json_doc.isNull()) {
-        QMessageBox::critical(0, "Error", "Failed to create JSON doc\n");
-    }
-
-    QJsonObject object = json_doc.object();
-
-    QJsonValue value = object.value("playersArray");
-    QJsonArray array = value.toArray();
-
-    foreach(const QJsonValue & v, array) {
-
-        if (v.toObject().value("Games").toDouble() == 0)
+void Widget::readFileAndPopulateTable() {
+    auto i = 0;
+    foreach(auto && value, downloader->jsonArray) {
+        if (value.toObject().value("Games").toDouble() == 0)
             continue;
+        ui->playerTable->setRowCount(i+1);
+        for (auto j = 0; j < ui->playerTable->columnCount(); j++) {
+            switch (j) {
+            case 0: {
+                auto *fCell = new QTableWidgetItem(value.toObject().value("Name").toString());
+                ui->playerTable->setItem(i, j, fCell);
+                break;
+            }
+            case 1: {
+                QString games = QString::number(value.toObject().value("Games").toDouble());
+                ui->playerTable->setItem(i, j, new QTableWidgetItem(games));
+                break;
+            }
+            case 2: {
+                QString rebounds = QString::number(value.toObject().value("Rebounds").toDouble() / value.toObject().value("Games").toDouble());
+                ui->playerTable->setItem(i, j, new QTableWidgetItem(rebounds));
+                break;
+            }
+            case 3: {
+                QString assists = QString::number(value.toObject().value("Assists").toDouble() / value.toObject().value("Games").toDouble());
+                ui->playerTable->setItem(i, j, new QTableWidgetItem(assists));
+                break;
+            }
+            case 4: {
+                QString steals = QString::number(value.toObject().value("Steals").toDouble() / value.toObject().value("Games").toDouble());
+                ui->playerTable->setItem(i, j, new QTableWidgetItem(steals));
+                break;
+            }
+            case 5: {
+                QString blocks = QString::number(value.toObject().value("Blocks").toDouble() / value.toObject().value("Games").toDouble());
+                ui->playerTable->setItem(i, j, new QTableWidgetItem(blocks));
+                break;
+            }
+            case 6: {
+                QString points = QString::number(value.toObject().value("Points").toDouble() / value.toObject().value("Games").toDouble());
+                ui->playerTable->setItem(i, j, new QTableWidgetItem(points));
+                break;
+            }
+            case 7: {
+                QString fantasyPoints = QString::number(value.toObject().value("Fantasy Points").toDouble());
+                ui->playerTable->setItem(i, j, new QTableWidgetItem(fantasyPoints));
+                break;
+            }
+            }
 
-        pS._name.insert(v.toObject().value("PlayerID").toInt(), v.toObject().value("Name").toString());
-        pS._stats.insert(v.toObject().value("PlayerID").toInt(), v.toObject().value("FantasyPoints").toDouble());
-        pS._stats.insert(v.toObject().value("PlayerID").toInt(), v.toObject().value("Points").toDouble() / v.toObject().value("Games").toDouble());
-        pS._stats.insert(v.toObject().value("PlayerID").toInt(), v.toObject().value("BlockedShots").toDouble() / v.toObject().value("Games").toDouble());
-        pS._stats.insert(v.toObject().value("PlayerID").toInt(), v.toObject().value("Steals").toDouble() / v.toObject().value("Games").toDouble());
-        pS._stats.insert(v.toObject().value("PlayerID").toInt(), v.toObject().value("Assists").toDouble() / v.toObject().value("Games").toDouble());
-        pS._stats.insert(v.toObject().value("PlayerID").toInt(), v.toObject().value("Rebounds").toDouble() / v.toObject().value("Games").toDouble());
-        pS._stats.insert(v.toObject().value("PlayerID").toInt(), v.toObject().value("Games").toDouble());
+        }
+        i++;
     }
+
 }
-
-
 
 
 void Widget::on_buttonDownload_clicked()
 {
-    jsonReader();
-    populateFirstColumn();
-    populateRest();
 }

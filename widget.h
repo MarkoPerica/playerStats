@@ -5,12 +5,8 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QFile>
 #include <QMessageBox>
-#include <QDir>
-#include <QTextStream>
 #include <QtDebug>
-#include <playerstats.h>
 #include <downloader.h>
 
 QT_BEGIN_NAMESPACE
@@ -32,11 +28,10 @@ public:
 
 private slots:
     void on_buttonDownload_clicked();
-    void readFile();
+    void readFileAndPopulateTable();
 
 private:
     Ui::Widget *ui;
-    playerStats pS;
     downloader *downloader;
 
 };

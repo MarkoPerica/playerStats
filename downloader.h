@@ -5,15 +5,20 @@
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkRequest>
 #include <QtNetwork/QNetworkReply>
-#include <QFile>
 #include <QUrl>
 #include <QDebug>
+#include <QJsonDocument>
+#include <QJsonArray>
+#include <QJsonObject>
 
 class downloader : public QObject
 {
     Q_OBJECT
 public:
     explicit downloader(QObject *parent = 0);
+
+    QJsonDocument document;
+    QJsonArray jsonArray;
 
 signals:
     void onReady();

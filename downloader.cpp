@@ -19,12 +19,10 @@ void downloader::onResult(QNetworkReply *reply) {
         qDebug() << reply->errorString();
     }
     else {
-        QFile *file = new QFile("C:/temp/players.json");
-        if (file->open(QFile::WriteOnly)) {
-            file->write(reply->readAll());
-            file->close();
-        }
+        QJsonDocument document = QJsonDocument::fromJson(reply->readAll());
+        QJsonArray jsonArray = document.array();
     }
     qDebug() << "Download completed";
+    reply->deleteLater();
     emit onReady();
 }
