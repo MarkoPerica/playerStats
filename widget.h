@@ -14,6 +14,7 @@
 #include <QTableWidgetItem>
 #include <QPen>
 #include <QBrush>
+#include <QTextCharFormat>
 #include "playerstats.h"
 #include "downloader.h"
 #include "schedule.h"
@@ -40,11 +41,6 @@ public:
     QString per_game(const QJsonValue& value, const std::string&name, double games);
     QDate transformDate(const QString date);
 
-    friend class QCalendarWidget;
-
-protected:
-    virtual void paintCell(QPainter *painter, const QRect &rect, const QDate &date) const;
-
 public slots:
     void cellClicked(int iRow);
 
@@ -57,7 +53,6 @@ private:
     playerStats *pS;
     downloader *downloader;
     schedule *schedule;
-    QList<QDate> g_dates;
     QList<int> keys;
 
 

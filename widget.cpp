@@ -33,7 +33,6 @@ Widget::~Widget()
     delete schedule;
     delete ui->playerTable;
     delete ui->buttonDownload;
-    delete ui->calendarWidget;
     delete ui;
 }
 
@@ -52,14 +51,13 @@ QString Widget::per_game(const QJsonValue &value, const std::string &name, doubl
 QDate Widget::transformDate(const QString date) {
     int pos = date.lastIndexOf(QChar('T'));
     QString s = date.left(pos);
-    std::reverse(s.begin(), s.end());
-    s.replace("-", ".");
-
-    return QDate::fromString(s);
-}
-
-void Widget::paintCell(QPainter *painter, const QRect &rect, const QDate &date) const {
-    ui->calendarWidget->paintCell();
+    QString year = s.mid(0,4);
+    QString month = s.mid(4, 4);
+    QString day = s.mid(8, 2);
+    QString ret;
+    ret.append(day).append(month).append(year);
+    ret.replace("-", ".");
+    return QDate::fromString(ret);
 }
 
 
@@ -103,6 +101,9 @@ void Widget::cellClicked(int iRow)
     QList<int>::const_iterator j;
     for (j = keys.constBegin(); j != keys.constEnd(); ++j) {
         auto date = schedule->date.value(*j);
-        g_dates.append(transformDate(date));
+        QTextCharFormat format;
+        format.setUnderlineColor(Qt::green);
+        ui->calendarWidget->setDateTextFormat(transformDate(date), format);
     }
+
 }

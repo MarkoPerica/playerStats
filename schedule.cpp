@@ -30,11 +30,10 @@ void schedule::onResult(QNetworkReply *reply) {
         foreach(const auto& value, jsonArray) {
             games.insert( i, value.toObject().value("HomeTeamID").toInt());
             games.insert( i, value.toObject().value("AwayTeamID").toInt());
-            date.insert( i, value.toObject().value("Date").toString());
+            date.insert( i, value.toObject().value("Day").toString());
             i++;
         }
     }
-    qDebug() << "Download completed";
     reply->deleteLater();
     emit onReady();
 }
