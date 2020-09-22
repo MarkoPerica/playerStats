@@ -7,83 +7,102 @@ Widget::Widget(QWidget *parent)
 {
     ui->setupUi(this);
     QStringList header;
-    header << "Name" << "Games" << "Rebounds" << "Assists" << "Steals" << "Blocks" << "Points" << "Fantasy Points";
+    header << "Name" << "Games" << "Rebounds" << "Assits" << "Steals" << "Blocks" << "Points" << "Fantasy Points";
     setWindowTitle("Player Stats");
     ui->playerTable->setColumnCount(8);
     ui->playerTable->setHorizontalHeaderLabels(header);
     ui->playerTable->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     ui->playerTable->resizeRowsToContents();
-    ui->playerTable->setMinimumHeight(500);
+
+    m_outlinePen.setColor(Qt::green);
+    m_transparentBrush.setColor(Qt::transparent);
 
     downloader = new class downloader();
 
-    connect(ui->buttonDownload, &QPushButton::clicked, downloader, &downloader::getData);
-    connect(downloader, &downloader::onReady, this, &Widget::readArrayAndPopulateTable);
+    schedule = new class schedule();
 
+    connect(ui->buttonDownload, &QPushButton::clicked, downloader, &downloader::getData);
+    connect(downloader, &downloader::onReady, this, &Widget::readFile);
+    connect(ui->buttonDownload, &QPushButton::clicked, schedule, &schedule::getData);
+    connect(ui->playerTable, &QTableWidget::cellClicked, this, &Widget::cellClicked);
 }
 
 Widget::~Widget()
 {
+    delete downloader;
+    delete schedule;
+    delete ui->playerTable;
+    delete ui->buttonDownload;
+    delete ui->calendarWidget;
     delete ui;
 }
 
-void Widget::readArrayAndPopulateTable() {
-    auto i = 0;
-    foreach(auto && value, downloader->jsonArray) {
-        if (value.toObject().value("Games").toDouble() == 0)
-            continue;
-        ui->playerTable->setRowCount(i+1);
-        for (auto j = 0; j < ui->playerTable->columnCount(); j++) {
-            switch (j) {
-            case 0: {
-                auto *fCell = new QTableWidgetItem(value.toObject().value("Name").toString());
-                ui->playerTable->setItem(i, j, fCell);
-                break;
-            }
-            case 1: {
-                QString games = QString::number(value.toObject().value("Games").toDouble());
-                ui->playerTable->setItem(i, j, new QTableWidgetItem(games));
-                break;
-            }
-            case 2: {
-                QString rebounds = QString::number(value.toObject().value("Rebounds").toDouble() / value.toObject().value("Games").toDouble());
-                ui->playerTable->setItem(i, j, new QTableWidgetItem(rebounds));
-                break;
-            }
-            case 3: {
-                QString assists = QString::number(value.toObject().value("Assists").toDouble() / value.toObject().value("Games").toDouble());
-                ui->playerTable->setItem(i, j, new QTableWidgetItem(assists));
-                break;
-            }
-            case 4: {
-                QString steals = QString::number(value.toObject().value("Steals").toDouble() / value.toObject().value("Games").toDouble());
-                ui->playerTable->setItem(i, j, new QTableWidgetItem(steals));
-                break;
-            }
-            case 5: {
-                QString blocks = QString::number(value.toObject().value("Blocks").toDouble() / value.toObject().value("Games").toDouble());
-                ui->playerTable->setItem(i, j, new QTableWidgetItem(blocks));
-                break;
-            }
-            case 6: {
-                QString points = QString::number(value.toObject().value("Points").toDouble() / value.toObject().value("Games").toDouble());
-                ui->playerTable->setItem(i, j, new QTableWidgetItem(points));
-                break;
-            }
-            case 7: {
-                QString fantasyPoints = QString::number(value.toObject().value("Fantasy Points").toDouble());
-                ui->playerTable->setItem(i, j, new QTableWidgetItem(fantasyPoints));
-                break;
-            }
-            }
+QString Widget::to_str(const QJsonValue &value, const std::string &name) {
+    return value.toObject().value(name.c_str()).toString();
+}
 
-        }
-        i++;
+double Widget::to_num(const QJsonValue &value, const std::string &name) {
+    return value.toObject().value(name.c_str()).toDouble();
+}
+
+QString Widget::per_game(const QJsonValue &value, const std::string &name, double games) {
+    return QString::number(to_num(value, name) / games);
+}
+
+QDate Widget::transformDate(const QString date) {
+    int pos = date.lastIndexOf(QChar('T'));
+    QString s = date.left(pos);
+    std::reverse(s.begin(), s.end());
+    s.replace("-", ".");
+
+    return QDate::fromString(s);
+}
+
+void Widget::paintCell(QPainter *painter, const QRect &rect, const QDate &date) const {
+    ui->calendarWidget->paintCell();
+}
+
+
+void Widget::readFile() {
+    auto row = 0;
+    foreach(const auto& value, downloader->jsonArray) {
+        auto games = to_num(value, "Games");
+        if (games == 0) continue;
+        ui->playerTable->setRowCount(row+1);
+        auto col = 0;
+        ui->playerTable->setItem(row, col++, new QTableWidgetItem(to_str(value, "Name")));
+        ui->playerTable->setItem(row, col++, new QTableWidgetItem(QString::number(games)));
+        ui->playerTable->setItem(row, col++, new QTableWidgetItem(per_game(value, "Rebounds", games)));
+        ui->playerTable->setItem(row, col++, new QTableWidgetItem(per_game(value, "Assists", games)));
+        ui->playerTable->setItem(row, col++, new QTableWidgetItem(per_game(value, "Steals", games)));
+        ui->playerTable->setItem(row, col++, new QTableWidgetItem(per_game(value, "BlockedShots", games)));
+        ui->playerTable->setItem(row, col++, new QTableWidgetItem(per_game(value, "Points", games)));
+        ui->playerTable->setItem(row, col++, new QTableWidgetItem(QString::number(to_num(value, "FantasyPoints"))));
+        ++row;
     }
+}
+
+void Widget::on_buttonDownload_clicked()
+{
 
 }
 
 
-void Widget::on_buttonDownload_clicked()
+void Widget::cellClicked(int iRow)
 {
+    QTableWidgetItem *item = new QTableWidgetItem;
+    item = ui->playerTable->item(iRow, 0);
+    auto teamID = downloader->players.value(item->text());
+
+    QMultiMap<int, int>::const_iterator i;
+    for (i = schedule->games.begin(); i != schedule->games.end(); i++) {
+        if (teamID == i.value())
+            keys.append(i.key());
+    }
+
+    QList<int>::const_iterator j;
+    for (j = keys.constBegin(); j != keys.constEnd(); ++j) {
+        auto date = schedule->date.value(*j);
+        g_dates.append(transformDate(date));
+    }
 }

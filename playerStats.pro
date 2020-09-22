@@ -19,11 +19,13 @@ SOURCES += \
     downloader.cpp \
     main.cpp \
     playerstats.cpp \
+    schedule.cpp \
     widget.cpp
 
 HEADERS += \
     downloader.h \
     playerstats.h \
+    schedule.h \
     widget.h
 
 FORMS += \
@@ -33,9 +35,3 @@ FORMS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
-
-DISTFILES += \
-    players.json
-
-RESOURCES += \
-    players.qrc

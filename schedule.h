@@ -1,5 +1,5 @@
-#ifndef DOWNLOADER_H
-#define DOWNLOADER_H
+#ifndef SCHEDULE_H
+#define SCHEDULE_H
 
 #include <QObject>
 #include <QtNetwork/QNetworkAccessManager>
@@ -12,18 +12,19 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonValue>
-#include <playerstats.h>
+#include "playerstats.h"
 
-class downloader : public QObject
+class schedule : public QObject
 {
     Q_OBJECT
 public:
-    explicit downloader(QObject *parent = 0);
-    ~downloader();
+    explicit schedule(QObject *parent = nullptr);
+    ~schedule();
 
     QJsonDocument document;
     QJsonArray jsonArray;
-    QMap<QString, int> players;
+    QMultiMap<int, int> games;
+    QMap<int, QString> date;
 
 signals:
     void onReady();
@@ -37,4 +38,4 @@ private:
     playerStats *playerStats;
 };
 
-#endif // DOWNLOADER_H
+#endif // SCHEDULE_H
