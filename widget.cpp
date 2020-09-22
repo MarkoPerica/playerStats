@@ -18,7 +18,7 @@ Widget::Widget(QWidget *parent)
     downloader = new class downloader();
 
     connect(ui->buttonDownload, &QPushButton::clicked, downloader, &downloader::getData);
-    connect(downloader, &downloader::onReady, this, &Widget::readFileAndPopulateTable);
+    connect(downloader, &downloader::onReady, this, &Widget::readArrayAndPopulateTable);
 
 }
 
@@ -27,7 +27,7 @@ Widget::~Widget()
     delete ui;
 }
 
-void Widget::readFileAndPopulateTable() {
+void Widget::readArrayAndPopulateTable() {
     auto i = 0;
     foreach(auto && value, downloader->jsonArray) {
         if (value.toObject().value("Games").toDouble() == 0)

@@ -28,7 +28,7 @@ public:
 
 private slots:
     void on_buttonDownload_clicked();
-    void readFileAndPopulateTable();
+    void readArrayAndPopulateTable();
 
 private:
     Ui::Widget *ui;
