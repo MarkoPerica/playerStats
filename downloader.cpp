@@ -19,8 +19,10 @@ void downloader::onResult(QNetworkReply *reply) {
         qDebug() << reply->errorString();
     }
     else {
-        QJsonDocument document = QJsonDocument::fromJson(reply->readAll());
-        QJsonArray jsonArray = document.array();
+        document = QJsonDocument::fromJson(reply->readAll());
+        jsonArray = document.array();
+        foreach(const QJsonValue & value, jsonArray)
+            qDebug() << value.toObject().value("Games").toDouble();
     }
     qDebug() << "Download completed";
     reply->deleteLater();
